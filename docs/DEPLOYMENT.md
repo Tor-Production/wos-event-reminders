@@ -30,7 +30,7 @@ Before creating a branch:
 
 1. Read `AGENTS.md`, `docs/ROADMAP.md`, and `docs/staging-preview.md`.
 2. Confirm the preceding roadmap ticket and any ticket already in release verification have completed every release gate.
-3. Verify the remote default branch (`origin/HEAD`). It is currently `mainи`.
+3. Verify the remote default branch (`origin/HEAD`). It is currently `main`.
 4. Fetch the remote, switch to the default branch, fast-forward only, and verify `git status --short` is empty.
 5. Create the exact branch named by the roadmap ticket.
 

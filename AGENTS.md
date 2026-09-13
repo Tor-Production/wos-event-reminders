@@ -6,7 +6,7 @@ These instructions apply to the entire repository. Read this file, [the roadmap]
 
 - Work on only one roadmap ticket at a time.
 - Do not change the scope or implementation of a ticket that is already in preview or release verification merely to prepare a later ticket.
-- Create the ticket's exact branch from a clean, freshly fast-forwarded copy of the repository default branch. The current default branch is `mainи`; if it is renamed, use the branch configured as the remote default.
+- Create the ticket's exact branch from a clean, freshly fast-forwarded copy of the repository default branch. The current default branch is `main`; if it is renamed, use the branch configured as the remote default.
 - Keep migrations, application changes, tests, and documentation for one ticket in that ticket's branch and pull request.
 - Never begin a ticket until every predecessor gate recorded in `docs/ROADMAP.md` is complete. An in-flight ticket also retains priority until its release gates are complete, even if the roadmap is reprioritized while it is being released.
 

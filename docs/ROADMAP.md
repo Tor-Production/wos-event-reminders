@@ -21,13 +21,15 @@ An already-implemented ticket that is still moving through preview or release ve
 2. `feature/copy-reminders`
 3. `feature/history-reminder-type-label`
 4. `feature/reminder-archive`
+5. `feature/event-reminder-preview-test-send`
 
 ### Transition state
 
 - `feature/one-time-reminders` has completed its production migration, merge, production deployment, smoke test, and clean-local-default-branch gates.
 - `feature/reminder-archive` was already implemented before this roadmap update and has completed its production migrations, merge, production deployment, smoke test, and clean-local-default-branch gates. Do not alter or restart that implementation as part of roadmap work.
 - `feature/copy-reminders` completed manual preview, merge, production deployment, smoke testing, and clean-local-default-branch gates without a D1 migration.
-- `feature/history-reminder-type-label` is the current ticket. Its implementation and staging migration may proceed, but it must stop at manual preview approval before production release.
+- `feature/history-reminder-type-label` completed every release gate. PR #6 merged as `88666703120ad6bd5b8f0069eec030b2d8fc2158`; migration `0005_delivery_schedule_type.sql` is present in production with no pending migrations; the production Worker build passed as version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea`; and production use/smoke testing was confirmed by the administrator.
+- `feature/event-reminder-preview-test-send` is the next ticket. It may begin only from a clean, updated `main` branch after the default-branch rename and MVP release tag are complete.
 
 The requested numbering is retained. Reminder-archive's earlier out-of-order release is recorded as a completed transition and does not change the remaining gate order.
 
@@ -128,9 +130,9 @@ Tests must cover:
 ## Ticket: history reminder type label
 
 - **Branch:** `feature/history-reminder-type-label`
-- **Status:** active after copy reminders completed every release gate; stop at manual preview approval.
+- **Status:** fully released. PR #6 merged as `88666703120ad6bd5b8f0069eec030b2d8fc2158`; migration `0005_delivery_schedule_type.sql` is applied with no remaining production pending state; production deployment `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` succeeded; and the administrator confirmed the production smoke test by actively using the build.
 - **Dependency (satisfied):** implementation began from a clean, freshly updated default branch only after copy reminders was verified in production.
-- **D1 migration:** `0005_delivery_schedule_type.sql`; apply to staging for preview and to production only after explicit preview approval.
+- **D1 migration:** `0005_delivery_schedule_type.sql`, applied to staging and production; the current production migration check reports no pending migrations.
 
 ### Requirements
 
@@ -154,15 +156,28 @@ Tests must cover:
 - Permanent reminder deletion retains both delivery history and the stored type.
 - Existing one-time, copy, and archive behavior remains passing.
 
-### Delivery checklist
+### Release evidence
 
-1. Run all tests and syntax checks.
-2. Apply only migration `0005_delivery_schedule_type.sql` to isolated staging and verify historical row preservation, defaults, constraints, and archive foreign keys.
-3. Commit and push only `feature/history-reminder-type-label`.
-4. Create a pull request targeting the repository default branch.
-5. Confirm a successful non-production Cloudflare preview and verify its staging bindings.
-6. Provide a manual testing checklist and stop before merging.
-7. Wait for explicit preview approval before applying `0005` to production or merging.
+- Pull request: [#6](https://github.com/Tor-Production/wos-event-reminders/pull/6), merged 2026-08-25 as `88666703120ad6bd5b8f0069eec030b2d8fc2158`.
+- Build checks: staging and production Workers Builds succeeded on the merge commit.
+- Production deployment: Worker version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` deployed 2026-08-25T08:27:25Z.
+- Production D1: migration `0005_delivery_schedule_type.sql` is applied; a current migration check reports no pending migrations.
+- Manual preview and production smoke test: confirmed by the administrator through active use of the deployed build.
+
+## Ticket: event reminder preview and per-event test send
+
+- **Branch:** `feature/event-reminder-preview-test-send`
+- **Status:** queued after `feature/history-reminder-type-label` completed every release gate.
+- **Goal:** show a live English reminder preview in the create/edit workflow and allow a validated, non-persisting test send of the current event form values.
+- **Architecture:** preview, per-event test sends, and scheduled delivery must use one canonical server-side reminder-message renderer. Test sends must have a clear `[TEST]` identifier and must not mutate schedules, delivery history, retry state, or idempotency state.
+- **Compatibility:** preserve the global webhook/configuration Send test feature unless the implementation establishes that it is redundant; support recurring and one-time reminders.
+- **D1 migration:** expected none; explicitly verify this after implementation.
+
+### Required verification
+
+- Test recurring and one-time rendering, preview/scheduled equivalence, test-only formatting, authentication, invalid inputs, delivery failures, and no scheduler/idempotency mutation.
+- Run `npm test`, `node --check src/index.js`, and `node --check public/app.js`.
+- Use only the isolated staging Worker/database and staging Discord webhook for preview and manual test sends; stop before merge for explicit preview approval.
 
 ## Ticket: reminder archive
 
