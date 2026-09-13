@@ -86,6 +86,14 @@ export default {
         return await listDeliveries(env);
       }
 
+      if (url.pathname === "/api/reminder-preview" && request.method === "POST") {
+        return await previewReminder(request);
+      }
+
+      if (url.pathname === "/api/reminder-test" && request.method === "POST") {
+        return await sendReminderTest(request, env);
+      }
+
       if (url.pathname === "/api/send-test" && request.method === "POST") {
         await sendDiscordMessage(
           env,
@@ -347,6 +355,17 @@ async function listDeliveries(env) {
   return json({ deliveries: results });
 }
 
+async function previewReminder(request) {
+  const input = validateEventInput(await readJson(request));
+  return json({ message: renderReminderMessage(input) });
+}
+
+async function sendReminderTest(request, env) {
+  const input = validateEventInput(await readJson(request));
+  await sendDiscordMessage(env, renderReminderMessage(input, { isTest: true }));
+  return json({ ok: true });
+}
+
 async function processDueEvents(env, nowMs) {
   await normalizeOverdueEvents(env, nowMs);
   const nowIso = new Date(nowMs).toISOString();
@@ -450,7 +469,7 @@ export async function deliverEvent(env, event) {
   const attempts = delivery.attempts + 1;
 
   try {
-    await sendDiscordMessage(env, event.message);
+    await sendDiscordMessage(env, renderReminderMessage(event));
     const sentAt = new Date().toISOString();
     const eventUpdate = isOneTime(event)
       ? env.DB.prepare(
@@ -557,6 +576,11 @@ async function finishExhaustedEvent(env, event) {
 
 function isOneTime(event) {
   return event.schedule_type === "one_time";
+}
+
+export function renderReminderMessage(event, { isTest = false } = {}) {
+  const message = typeof event?.message === "string" ? event.message.trim() : "";
+  return isTest ? `[TEST] ${message}` : message;
 }
 
 async function sendDiscordMessage(env, content) {

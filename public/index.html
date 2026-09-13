@@ -144,6 +144,16 @@
           <label class="wide">Discord message
             <textarea id="event-message" maxlength="2000" rows="3" required></textarea>
           </label>
+          <section class="reminder-preview wide" aria-labelledby="reminder-preview-title">
+            <div class="reminder-preview-heading">
+              <div>
+                <p class="eyebrow">DISCORD</p>
+                <h3 id="reminder-preview-title">Reminder Preview</h3>
+              </div>
+              <button id="event-test-button" class="secondary" type="button" disabled>Send Test</button>
+            </div>
+            <p id="reminder-preview-content" class="preview-placeholder" aria-live="polite">Complete the event details to preview the Discord reminder.</p>
+          </section>
           <label class="toggle wide">
             <input id="event-enabled" type="checkbox" checked />
             <span>Reminder enabled</span>
@@ -159,6 +169,6 @@
     </dialog>
 
     <div id="toast" class="toast hidden" role="status"></div>
-    <script type="module" src="/app.js?v=307cde40cf99"></script>
+    <script type="module" src="/app.js?v=2c9b9a049c6f"></script>
   </body>
 </html>
