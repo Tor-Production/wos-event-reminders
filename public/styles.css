@@ -179,6 +179,12 @@ dialog::backdrop { background: rgba(0, 7, 13, .78); backdrop-filter: blur(7px); 
 .icon-button { padding: 3px 10px; color: var(--muted); background: transparent; font-size: 1.7rem; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .wide { grid-column: 1 / -1; }
+.reminder-preview { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: rgba(2, 15, 24, .42); }
+.reminder-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+.reminder-preview-heading .eyebrow { margin: 0 0 3px; }
+.reminder-preview h3 { margin: 0; font-size: .96rem; }
+.reminder-preview p { margin: 0; white-space: pre-wrap; line-height: 1.55; }
+.reminder-preview .preview-placeholder { color: var(--muted); }
 .toggle { display: flex; align-items: center; gap: 9px; }
 .toggle input { width: auto; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }

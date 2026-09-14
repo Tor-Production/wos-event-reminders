@@ -4,6 +4,8 @@ const $ = (selector) => document.querySelector(selector);
 const state = { events: [], archivedEvents: [], deliveries: [] };
 const REMINDERS_API_PATH = "/api/reminders";
 const ARCHIVE_API_PATH = "/api/archive";
+const REMINDER_PREVIEW_API_PATH = "/api/reminder-preview";
+const REMINDER_TEST_API_PATH = "/api/reminder-test";
 
 const loginView = $("#login-view");
 const appView = $("#app-view");
@@ -18,7 +20,18 @@ $("#add-button").addEventListener("click", () => openEventDialog());
 $("#archive-view-button").addEventListener("click", showArchive);
 $("#schedule-view-button").addEventListener("click", showSchedule);
 $("#event-form").addEventListener("submit", saveEvent);
-$("#schedule-type").addEventListener("change", updateScheduleTypeControls);
+$("#schedule-type").addEventListener("change", () => {
+  updateScheduleTypeControls();
+  queueReminderPreview();
+});
+$("#event-test-button").addEventListener("click", onSendReminderTest);
+for (const selector of [
+  "#event-name", "#anchor-date", "#start-time", "#interval-days",
+  "#reminder-minutes", "#event-message",
+]) {
+  $(selector).addEventListener("input", queueReminderPreview);
+}
+$("#event-enabled").addEventListener("change", queueReminderPreview);
 $("#close-dialog").addEventListener("click", () => dialog.close());
 $("#cancel-dialog").addEventListener("click", () => dialog.close());
 
@@ -255,6 +268,7 @@ function openEventDialog(event = null, action = "save") {
   $("#form-error").textContent = "";
   updateScheduleTypeControls();
   dialog.showModal();
+  queueReminderPreview({ immediate: true });
   $("#event-name").focus();
 }
 
@@ -264,16 +278,7 @@ async function saveEvent(event) {
   const id = $("#event-id").value;
   const restoring = $("#event-action").value === "restore";
   const copying = $("#event-action").value === "copy";
-  const payload = {
-    name: $("#event-name").value,
-    schedule_type: $("#schedule-type").value,
-    anchor_date: $("#anchor-date").value,
-    start_time_utc: $("#start-time").value,
-    interval_days: Number($("#interval-days").value),
-    reminder_minutes: Number($("#reminder-minutes").value),
-    message: $("#event-message").value,
-    enabled: $("#event-enabled").checked,
-  };
+  const payload = readEventFormPayload();
 
   button.disabled = true;
   $("#form-error").textContent = "";
@@ -294,6 +299,73 @@ async function saveEvent(event) {
     $("#form-error").textContent = error.message;
   } finally {
     button.disabled = false;
+  }
+}
+
+function readEventFormPayload() {
+  return {
+    name: $("#event-name").value,
+    schedule_type: $("#schedule-type").value,
+    anchor_date: $("#anchor-date").value,
+    start_time_utc: $("#start-time").value,
+    interval_days: Number($("#interval-days").value),
+    reminder_minutes: Number($("#reminder-minutes").value),
+    message: $("#event-message").value,
+    enabled: $("#event-enabled").checked,
+  };
+}
+
+let previewTimer;
+let previewRequestId = 0;
+
+function queueReminderPreview({ immediate = false } = {}) {
+  clearTimeout(previewTimer);
+  const requestId = ++previewRequestId;
+  const preview = $("#reminder-preview-content");
+  const sendButton = $("#event-test-button");
+  preview.textContent = "Updating reminder preview…";
+  preview.classList.add("preview-placeholder");
+  sendButton.disabled = true;
+  previewTimer = setTimeout(
+    () => updateReminderPreview(requestId),
+    immediate ? 0 : 180,
+  );
+}
+
+async function updateReminderPreview(requestId) {
+  const preview = $("#reminder-preview-content");
+  const sendButton = $("#event-test-button");
+  try {
+    const result = await api(REMINDER_PREVIEW_API_PATH, {
+      method: "POST",
+      body: readEventFormPayload(),
+    });
+    if (requestId !== previewRequestId) return;
+    preview.textContent = result.message;
+    preview.classList.remove("preview-placeholder");
+    sendButton.disabled = false;
+  } catch {
+    if (requestId !== previewRequestId) return;
+    preview.textContent = "Complete the event details to preview the Discord reminder.";
+    preview.classList.add("preview-placeholder");
+    sendButton.disabled = true;
+  }
+}
+
+async function onSendReminderTest() {
+  const button = $("#event-test-button");
+  button.disabled = true;
+  $("#form-error").textContent = "";
+  try {
+    await api(REMINDER_TEST_API_PATH, {
+      method: "POST",
+      body: readEventFormPayload(),
+    });
+    toast("Test reminder sent to Discord.");
+  } catch (error) {
+    $("#form-error").textContent = error.message;
+  } finally {
+    queueReminderPreview({ immediate: true });
   }
 }
 

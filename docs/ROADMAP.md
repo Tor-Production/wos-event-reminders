@@ -167,11 +167,11 @@ Tests must cover:
 ## Ticket: event reminder preview and per-event test send
 
 - **Branch:** `feature/event-reminder-preview-test-send`
-- **Status:** queued after `feature/history-reminder-type-label` completed every release gate.
+- **Status:** active from the clean, tagged `v1.0.0` `main` baseline after `feature/history-reminder-type-label` completed every release gate.
 - **Goal:** show a live English reminder preview in the create/edit workflow and allow a validated, non-persisting test send of the current event form values.
 - **Architecture:** preview, per-event test sends, and scheduled delivery must use one canonical server-side reminder-message renderer. Test sends must have a clear `[TEST]` identifier and must not mutate schedules, delivery history, retry state, or idempotency state.
 - **Compatibility:** preserve the global webhook/configuration Send test feature unless the implementation establishes that it is redundant; support recurring and one-time reminders.
-- **D1 migration:** expected none; explicitly verify this after implementation.
+- **D1 migration:** none. Preview/test requests validate and render the submitted form data without persisting it; existing schema safely supports the feature.
 
 ### Required verification
 
