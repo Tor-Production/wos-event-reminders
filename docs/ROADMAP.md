@@ -2,6 +2,119 @@
 
 This file is the persistent source of truth for ticket order, dependencies, scope, and release readiness. The mandatory workflow is defined in root `AGENTS.md` and `docs/DEPLOYMENT.md`; it must not be replaced by abbreviated ticket notes.
 
+GitHub Project [WOS Event Reminders Roadmap](https://github.com/orgs/Tor-Production/projects/4) is the operational source of truth for current status and prioritization. This document preserves durable sequencing, architecture, and release evidence. Each roadmap issue contains implementation scope, non-goals, acceptance criteria, dependency links, effort, a recommended Codex configuration, and verification.
+
+## Current orchestration state
+
+- R07 is implemented and [PR #7](https://github.com/Tor-Production/wos-event-reminders/pull/7) merged as 803b858c28a666aef8e14d3aa42d0e84816fa32e.
+- R07 remains In Review / release verification, not Done. The PR records manual preview approval as outstanding, no production deployment contains the merged R07 code, and production smoke testing is not recorded.
+- The local main branch has been synchronized to the R07 merge commit. No D1 migration is required for R07.
+- Do not start R02 or another product implementation until the remaining R07 release gates are complete.
+- Once R07 is Done, the immediate feature sequence remains R02 → R03 → R05 → R01 → R04.
+- There are currently no Ready implementation issues because the in-flight R07 release gate retains priority.
+
+## Roadmap register
+
+| ID | Work item | Priority | Effort | Status | Blocked by | Milestone | Purpose |
+| --- | --- | --- | ---: | --- | --- | --- | --- |
+| R01 | [Timezone support](https://github.com/Tor-Production/wos-event-reminders/issues/8) | P0 | 6 | Backlog | — | M1 | Use IANA timezones while preserving UTC internally. |
+| R02 | [Localization framework](https://github.com/Tor-Production/wos-event-reminders/issues/9) | P0 | 5 | Backlog | R07 release sequence | M1 | Establish six initial locale catalogs and English fallback. |
+| R03 | [Language selector and browser detection](https://github.com/Tor-Production/wos-event-reminders/issues/10) | P0 | 3 | Blocked | R02 | M1 | Select, detect, and persist dashboard language. |
+| R04 | [Localized dates, times and statuses](https://github.com/Tor-Production/wos-event-reminders/issues/11) | P0 | 4 | Blocked | R01, R02 | M1 | Format schedule information with locale-aware APIs. |
+| R05 | [Localized reminder messages](https://github.com/Tor-Production/wos-event-reminders/issues/12) | P0 | 5 | Blocked | R02 | M1 | Localize canonical reminders independently from dashboard locale. |
+| R06 | [Multiple reminder offsets per event](https://github.com/Tor-Production/wos-event-reminders/issues/13) | P0 | 8 | Backlog | — | M2 | Deliver multiple idempotent offsets for one occurrence. |
+| R07 | [Reminder Preview + Per-Event Send Test](https://github.com/Tor-Production/wos-event-reminders/pull/7) | P0 | 4 | In Review | Release verification | M1 | Preview and test current form values through one canonical renderer. |
+| R08 | [Pause / Resume](https://github.com/Tor-Production/wos-event-reminders/issues/14) | P0 | 4 | Backlog | — | M1 | Pause reminders without archiving them. |
+| R09 | [Skip next occurrence](https://github.com/Tor-Production/wos-event-reminders/issues/15) | P0 | 7 | Backlog | — | M2 | Skip one occurrence without changing recurrence. |
+| R10 | [Duplicate event](https://github.com/Tor-Production/wos-event-reminders/issues/16) | P1 | 2 | Backlog | — | M1 | Clone editable configuration without system state. |
+| R11 | [Whiteout Survival presets](https://github.com/Tor-Production/wos-event-reminders/issues/17) | P1 | 4 | Backlog | R02 recommended | M1 | Add editable game presets outside scheduler logic. |
+| R12 | [Show next occurrences](https://github.com/Tor-Production/wos-event-reminders/issues/18) | P1 | 5 | Blocked | R01 | M2 | Preview approximately three canonical occurrences. |
+| R13 | [Delivery diagnostics](https://github.com/Tor-Production/wos-event-reminders/issues/19) | P1 | 6 | Backlog | — | M2 | Record safe, provider-neutral delivery diagnostics. |
+| R14 | [Security hardening](https://github.com/Tor-Production/wos-event-reminders/issues/20) | P1 | 8 | Backlog | — | M2 | Harden authentication, sessions, secrets, and destructive actions. |
+| R15 | [Alliance / workspace settings](https://github.com/Tor-Production/wos-event-reminders/issues/21) | P1 | 6 | Backlog | R01, R02 recommended | M5 | Move alliance assumptions into configuration. |
+| R16 | [Notification destinations & routing](https://github.com/Tor-Production/wos-event-reminders/issues/22) | P1 | 8 | Blocked | R24 | M3 | Route reminders to reusable provider destinations. |
+| R17 | [Export / Import](https://github.com/Tor-Production/wos-event-reminders/issues/23) | P1 | 5 | Backlog | R15 recommended | M5 | Port versioned configuration without secrets. |
+| R18 | [ICS calendar feed](https://github.com/Tor-Production/wos-event-reminders/issues/24) | P1 | 6 | Blocked | R01 | M5 | Publish canonical occurrences as an ICS feed. |
+| R19 | [Mobile UX / PWA](https://github.com/Tor-Production/wos-event-reminders/issues/25) | P1 | 5 | Backlog | — | M1 | Support real mobile officer workflows. |
+| R20 | [Automated CI](https://github.com/Tor-Production/wos-event-reminders/issues/26) | P1 | 5 | Backlog | — | M2 | Run safe, deterministic pull-request checks. |
+| R21 | [Multi-workspace architecture](https://github.com/Tor-Production/wos-event-reminders/issues/27) | P2 | 10 | Blocked | R15 | M6 | Introduce tenant data isolation and migration. |
+| R22 | [Discord OAuth login](https://github.com/Tor-Production/wos-event-reminders/issues/28) | P2 | 8 | Blocked | R21 | M6 | Add individual Discord identity. |
+| R23 | [Roles & permissions](https://github.com/Tor-Production/wos-event-reminders/issues/29) | P2 | 8 | Blocked | R21, R22 | M6 | Enforce workspace authorization. |
+| R24 | [Notification Provider Abstraction](https://github.com/Tor-Production/wos-event-reminders/issues/30) | P1 | 8 | Backlog | — | M3 | Put Discord behind a capability-aware provider boundary. |
+| R25 | [Game-pack abstraction](https://github.com/Tor-Production/wos-event-reminders/issues/31) | P2 | 8 | Backlog | R11, R15 recommended | M6 | Isolate game-specific presets and metadata. |
+| R26 | [Public/shareable schedule](https://github.com/Tor-Production/wos-event-reminders/issues/32) | P2 | 6 | Blocked | R01 | M5 | Expose a safe, revocable read-only schedule. |
+| R27 | [Audit log](https://github.com/Tor-Production/wos-event-reminders/issues/33) | P2 | 6 | Blocked | R21, R22 | M6 | Attribute sensitive administrative actions without secrets. |
+| R28 | [Service dashboard](https://github.com/Tor-Production/wos-event-reminders/issues/34) | P2 | 6 | Blocked | R13 | M5 | Summarize provider-aware delivery health. |
+| R29 | [Optional HyperFrames rich reminders](https://github.com/Tor-Production/wos-event-reminders/issues/35) | Later | 8 | Blocked | R07 | M7 | Add optional pre-rendered rich reminder media. |
+| R31 | [Telegram Provider](https://github.com/Tor-Production/wos-event-reminders/issues/36) | P1 | 5 | Blocked | R24 | M3 | Prove provider reuse with the Telegram Bot API. |
+| R32 | [WhatsApp Provider](https://github.com/Tor-Production/wos-event-reminders/issues/37) | P1 | 8 | Blocked | R24 | M3 | Add policy-compliant WhatsApp Business delivery. |
+| R33 | [Web Push Notifications](https://github.com/Tor-Production/wos-event-reminders/issues/38) | P1 | 7 | Backlog | R19, R16 recommended | M3 | Deliver opt-in browser/device notifications. |
+| R34 | [Email Provider](https://github.com/Tor-Production/wos-event-reminders/issues/39) | P1 | 5 | Blocked | R24 | M3 | Add transactional email as a universal fallback. |
+| R35 | [LINE Provider](https://github.com/Tor-Production/wos-event-reminders/issues/40) | P2 | 6 | Blocked | R24 | M4 | Support communities that coordinate through LINE. |
+| R36 | [Facebook Messenger Provider](https://github.com/Tor-Production/wos-event-reminders/issues/41) | P2 | 7 | Blocked | R24 | M4 | Determine feasibility before any compliant implementation. |
+| R37 | [WeChat / Weixin Provider](https://github.com/Tor-Production/wos-event-reminders/issues/42) | Later | 8 | Blocked | R24 | M4 | Run a regional feasibility spike before implementation. |
+| R38 | [Viber Provider](https://github.com/Tor-Production/wos-event-reminders/issues/43) | Later | 7 | Blocked | R24 | M4 | Verify onboarding and costs before implementation. |
+
+R30 is intentionally retired. Its identifier is reserved, and no GitHub issue exists for it.
+
+## Dependency map
+
+Solid arrows are hard blockers. Dashed arrows are recommended prerequisites or ordering guidance.
+
+~~~mermaid
+flowchart TD
+  R07[R07 canonical reminder preview] -. release sequence .-> R02[R02 localization framework]
+  R07 --> R29[R29 optional rich media]
+  R02 --> R03[R03 language selector]
+  R02 --> R04[R04 localized dates and statuses]
+  R02 --> R05[R05 localized reminders]
+  R01[R01 timezone support] --> R04
+  R01 --> R12[R12 next occurrences]
+  R01 --> R18[R18 ICS feed]
+  R01 --> R26[R26 public schedule]
+  R13[R13 delivery diagnostics] --> R28[R28 service dashboard]
+  R15[R15 workspace settings] --> R21[R21 multi-workspace]
+  R21 --> R22[R22 Discord OAuth]
+  R21 --> R23[R23 roles and permissions]
+  R22 --> R23
+  R21 --> R27[R27 audit log]
+  R22 --> R27
+  R24[R24 provider abstraction] --> R16[R16 destinations and routing]
+  R24 --> R31[R31 Telegram]
+  R24 --> R32[R32 WhatsApp]
+  R24 --> R34[R34 Email]
+  R24 --> R35[R35 LINE]
+  R24 --> R36[R36 Messenger]
+  R24 --> R37[R37 WeChat]
+  R24 --> R38[R38 Viber]
+  R16 -. recommended .-> R31
+  R16 -. recommended .-> R33[R33 Web Push]
+  R19[R19 mobile UX] -. recommended .-> R33
+  R05 -. recommended .-> R29
+  R16 -. recommended .-> R29
+~~~
+
+## Notification architecture and channel scope
+
+The scheduler must decide that a reminder is due without constructing provider-specific payloads. Canonical reminder content flows through reusable destinations into capability-aware notification providers. Credentials remain server-side, and delivery identity must eventually include event occurrence, reminder offset, and destination so one provider's success cannot suppress another provider's retry.
+
+The intended channel sequence is approximately:
+
+1. Discord as the existing provider.
+2. R24 provider abstraction.
+3. R31 Telegram as the first proof of reuse.
+4. R16 destination routing.
+5. R33 Web Push and R34 Email.
+6. R32 WhatsApp.
+7. R35 LINE and R36 Messenger.
+8. R37 WeChat and R38 Viber when regional feasibility justifies them.
+
+SMS, KakaoTalk, Slack, Microsoft Teams, and generic enterprise notification channels are intentionally out of scope unless the user revisits that decision.
+
+## Optional HyperFrames policy
+
+HyperFrames is not part of routine pull-request or changelog work. Do not offer or run PR-to-video automatically, create a per-PR approval gate, or install or refresh HyperFrames during ordinary orchestration. R29 is the planned optional production use case, with motion graphics preferred for reusable rich reminder media. Rendering belongs outside the scheduler Worker, plain text remains the reliable primary path, and generated projects or assets stay outside this repository unless explicitly requested.
+
 ## Sequencing rule
 
 Do not begin a ticket until the preceding ticket has:
@@ -15,7 +128,7 @@ Do not begin a ticket until the preceding ticket has:
 
 An already-implemented ticket that is still moving through preview or release verification must finish unchanged before work starts on a newly queued ticket.
 
-## Requested roadmap order
+## Released foundation sequence
 
 1. `feature/one-time-reminders`
 2. `feature/copy-reminders`
@@ -29,7 +142,7 @@ An already-implemented ticket that is still moving through preview or release ve
 - `feature/reminder-archive` was already implemented before this roadmap update and has completed its production migrations, merge, production deployment, smoke test, and clean-local-default-branch gates. Do not alter or restart that implementation as part of roadmap work.
 - `feature/copy-reminders` completed manual preview, merge, production deployment, smoke testing, and clean-local-default-branch gates without a D1 migration.
 - `feature/history-reminder-type-label` completed every release gate. PR #6 merged as `88666703120ad6bd5b8f0069eec030b2d8fc2158`; migration `0005_delivery_schedule_type.sql` is present in production with no pending migrations; the production Worker build passed as version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea`; and production use/smoke testing was confirmed by the administrator.
-- `feature/event-reminder-preview-test-send` is the next ticket. It may begin only from a clean, updated `main` branch after the default-branch rename and MVP release tag are complete.
+- `feature/event-reminder-preview-test-send` was implemented from the clean `v1.0.0` baseline and merged through PR #7. It remains in release verification because manual preview approval is not recorded, the production Worker still runs version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` from 2026-08-25, and no R07 production smoke test is recorded. The local `main` branch is synchronized to merge commit `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
 
 The requested numbering is retained. Reminder-archive's earlier out-of-order release is recorded as a completed transition and does not change the remaining gate order.
 
@@ -167,7 +280,9 @@ Tests must cover:
 ## Ticket: event reminder preview and per-event test send
 
 - **Branch:** `feature/event-reminder-preview-test-send`
-- **Status:** active from the clean, tagged `v1.0.0` `main` baseline after `feature/history-reminder-type-label` completed every release gate.
+- **Status:** implementation complete and PR #7 merged; In Review / release verification until manual approval evidence, production deployment, and production smoke testing are complete.
+- **Merged commit:** `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
+- **Production state:** no R07 production deployment is present; the current production Worker version remains `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` from the preceding ticket.
 - **Goal:** show a live English reminder preview in the create/edit workflow and allow a validated, non-persisting test send of the current event form values.
 - **Architecture:** preview, per-event test sends, and scheduled delivery must use one canonical server-side reminder-message renderer. Test sends must have a clear `[TEST]` identifier and must not mutate schedules, delivery history, retry state, or idempotency state.
 - **Compatibility:** preserve the global webhook/configuration Send test feature unless the implementation establishes that it is redundant; support recurring and one-time reminders.
