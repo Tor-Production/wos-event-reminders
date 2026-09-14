@@ -37,3 +37,13 @@ Do not start the next ticket if any gate is failed, unknown, awaiting approval, 
 - Never print, commit, paste into commands, or include in screenshots any webhook URL, dashboard password, session secret, or secret value. Refer only to Cloudflare secret names.
 - Use Discord delivery tests only when the user has authorized them and verify the destination is the intended staging or production channel.
 - Stop and report discrepancies in branch state, migrations, Cloudflare bindings, deployment state, or production data instead of bypassing a gate.
+
+## HyperFrames
+
+- HyperFrames is optional and is not part of the normal pull-request workflow.
+- Do not offer or run `/pr-to-video` automatically for pull requests, and do not add a per-PR HyperFrames approval gate.
+- Use HyperFrames only when an implementation ticket explicitly requires it (currently R29) or the user explicitly requests a specific video or media task.
+- When HyperFrames is required, install only the necessary skills project-locally for Codex; never install globally unless the user explicitly requests it.
+- Prefer `/motion-graphics` for the planned rich-reminder use case.
+- Keep generated HyperFrames projects and artifacts outside this application repository unless the user explicitly requests otherwise.
+- Never expose application or notification-provider secrets to HyperFrames.
