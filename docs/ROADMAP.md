@@ -7,23 +7,23 @@ GitHub Project [WOS Event Reminders Roadmap](https://github.com/orgs/Tor-Product
 ## Current orchestration state
 
 - R07 is implemented and [PR #7](https://github.com/Tor-Production/wos-event-reminders/pull/7) merged as 803b858c28a666aef8e14d3aa42d0e84816fa32e.
-- R07 remains In Review / release verification, not Done. The PR records manual preview approval as outstanding, no production deployment contains the merged R07 code, and production smoke testing is not recorded.
-- The local main branch has been synchronized to the R07 merge commit. No D1 migration is required for R07.
-- Do not start R02 or another product implementation until the remaining R07 release gates are complete.
-- Once R07 is Done, the immediate feature sequence remains R02 → R03 → R05 → R01 → R04.
-- There are currently no Ready implementation issues because the in-flight R07 release gate retains priority.
+- R07 is Done. The administrator explicitly approved manual preview testing on 2026-09-14 and confirmed the tested behavior works.
+- R07 required no D1 migration. Production deployed Worker version `ce2eec36-8390-497d-b11c-6f22b2ed0b91` with the production database binding and 100% traffic.
+- Production smoke testing returned HTTP 200 with the Reminder Preview UI and HTTP 401 for unauthenticated session, preview, and test-send routes. No production login, data mutation, reminder send, or Discord message was performed.
+- The local `main` branch is clean and synchronized to merge commit `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
+- R02 is Ready. The immediate feature sequence is R02 → R03 → R05 → R01 → R04.
 
 ## Roadmap register
 
 | ID | Work item | Priority | Effort | Status | Blocked by | Milestone | Purpose |
 | --- | --- | --- | ---: | --- | --- | --- | --- |
 | R01 | [Timezone support](https://github.com/Tor-Production/wos-event-reminders/issues/8) | P0 | 6 | Backlog | — | M1 | Use IANA timezones while preserving UTC internally. |
-| R02 | [Localization framework](https://github.com/Tor-Production/wos-event-reminders/issues/9) | P0 | 5 | Backlog | R07 release sequence | M1 | Establish six initial locale catalogs and English fallback. |
+| R02 | [Localization framework](https://github.com/Tor-Production/wos-event-reminders/issues/9) | P0 | 5 | Ready | — | M1 | Establish six initial locale catalogs and English fallback. |
 | R03 | [Language selector and browser detection](https://github.com/Tor-Production/wos-event-reminders/issues/10) | P0 | 3 | Blocked | R02 | M1 | Select, detect, and persist dashboard language. |
 | R04 | [Localized dates, times and statuses](https://github.com/Tor-Production/wos-event-reminders/issues/11) | P0 | 4 | Blocked | R01, R02 | M1 | Format schedule information with locale-aware APIs. |
 | R05 | [Localized reminder messages](https://github.com/Tor-Production/wos-event-reminders/issues/12) | P0 | 5 | Blocked | R02 | M1 | Localize canonical reminders independently from dashboard locale. |
 | R06 | [Multiple reminder offsets per event](https://github.com/Tor-Production/wos-event-reminders/issues/13) | P0 | 8 | Backlog | — | M2 | Deliver multiple idempotent offsets for one occurrence. |
-| R07 | [Reminder Preview + Per-Event Send Test](https://github.com/Tor-Production/wos-event-reminders/pull/7) | P0 | 4 | In Review | Release verification | M1 | Preview and test current form values through one canonical renderer. |
+| R07 | [Reminder Preview + Per-Event Send Test](https://github.com/Tor-Production/wos-event-reminders/pull/7) | P0 | 4 | Done | — | M1 | Preview and test current form values through one canonical renderer. |
 | R08 | [Pause / Resume](https://github.com/Tor-Production/wos-event-reminders/issues/14) | P0 | 4 | Backlog | — | M1 | Pause reminders without archiving them. |
 | R09 | [Skip next occurrence](https://github.com/Tor-Production/wos-event-reminders/issues/15) | P0 | 7 | Backlog | — | M2 | Skip one occurrence without changing recurrence. |
 | R10 | [Duplicate event](https://github.com/Tor-Production/wos-event-reminders/issues/16) | P1 | 2 | Backlog | — | M1 | Clone editable configuration without system state. |
@@ -45,7 +45,7 @@ GitHub Project [WOS Event Reminders Roadmap](https://github.com/orgs/Tor-Product
 | R26 | [Public/shareable schedule](https://github.com/Tor-Production/wos-event-reminders/issues/32) | P2 | 6 | Blocked | R01 | M5 | Expose a safe, revocable read-only schedule. |
 | R27 | [Audit log](https://github.com/Tor-Production/wos-event-reminders/issues/33) | P2 | 6 | Blocked | R21, R22 | M6 | Attribute sensitive administrative actions without secrets. |
 | R28 | [Service dashboard](https://github.com/Tor-Production/wos-event-reminders/issues/34) | P2 | 6 | Blocked | R13 | M5 | Summarize provider-aware delivery health. |
-| R29 | [Optional HyperFrames rich reminders](https://github.com/Tor-Production/wos-event-reminders/issues/35) | Later | 8 | Blocked | R07 | M7 | Add optional pre-rendered rich reminder media. |
+| R29 | [Optional HyperFrames rich reminders](https://github.com/Tor-Production/wos-event-reminders/issues/35) | Later | 8 | Backlog | — | M7 | Add optional pre-rendered rich reminder media; R05 and R16 remain recommended prerequisites. |
 | R31 | [Telegram Provider](https://github.com/Tor-Production/wos-event-reminders/issues/36) | P1 | 5 | Blocked | R24 | M3 | Prove provider reuse with the Telegram Bot API. |
 | R32 | [WhatsApp Provider](https://github.com/Tor-Production/wos-event-reminders/issues/37) | P1 | 8 | Blocked | R24 | M3 | Add policy-compliant WhatsApp Business delivery. |
 | R33 | [Web Push Notifications](https://github.com/Tor-Production/wos-event-reminders/issues/38) | P1 | 7 | Backlog | R19, R16 recommended | M3 | Deliver opt-in browser/device notifications. |
@@ -142,7 +142,7 @@ An already-implemented ticket that is still moving through preview or release ve
 - `feature/reminder-archive` was already implemented before this roadmap update and has completed its production migrations, merge, production deployment, smoke test, and clean-local-default-branch gates. Do not alter or restart that implementation as part of roadmap work.
 - `feature/copy-reminders` completed manual preview, merge, production deployment, smoke testing, and clean-local-default-branch gates without a D1 migration.
 - `feature/history-reminder-type-label` completed every release gate. PR #6 merged as `88666703120ad6bd5b8f0069eec030b2d8fc2158`; migration `0005_delivery_schedule_type.sql` is present in production with no pending migrations; the production Worker build passed as version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea`; and production use/smoke testing was confirmed by the administrator.
-- `feature/event-reminder-preview-test-send` was implemented from the clean `v1.0.0` baseline and merged through PR #7. It remains in release verification because manual preview approval is not recorded, the production Worker still runs version `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` from 2026-08-25, and no R07 production smoke test is recorded. The local `main` branch is synchronized to merge commit `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
+- `feature/event-reminder-preview-test-send` completed every release gate. The administrator approved manual preview testing on 2026-09-14; no D1 migration was required; production Worker version `ce2eec36-8390-497d-b11c-6f22b2ed0b91` received 100% traffic with the production D1 binding; protected-route smoke checks passed without a production login, data mutation, reminder send, or Discord message; and local `main` is clean at merge commit `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
 
 The requested numbering is retained. Reminder-archive's earlier out-of-order release is recorded as a completed transition and does not change the remaining gate order.
 
@@ -280,13 +280,16 @@ Tests must cover:
 ## Ticket: event reminder preview and per-event test send
 
 - **Branch:** `feature/event-reminder-preview-test-send`
-- **Status:** implementation complete and PR #7 merged; In Review / release verification until manual approval evidence, production deployment, and production smoke testing are complete.
+- **Status:** fully released; every repository release gate is complete.
 - **Merged commit:** `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
-- **Production state:** no R07 production deployment is present; the current production Worker version remains `db9ba21d-c8f9-4ba3-888a-8c2abefb91ea` from the preceding ticket.
+- **Production state:** Worker version `ce2eec36-8390-497d-b11c-6f22b2ed0b91` deployed on 2026-09-14 and serves 100% of production traffic with the expected production D1 binding.
 - **Goal:** show a live English reminder preview in the create/edit workflow and allow a validated, non-persisting test send of the current event form values.
 - **Architecture:** preview, per-event test sends, and scheduled delivery must use one canonical server-side reminder-message renderer. Test sends must have a clear `[TEST]` identifier and must not mutate schedules, delivery history, retry state, or idempotency state.
 - **Compatibility:** preserve the global webhook/configuration Send test feature unless the implementation establishes that it is redundant; support recurring and one-time reminders.
 - **D1 migration:** none. Preview/test requests validate and render the submitted form data without persisting it; existing schema safely supports the feature.
+- **Manual preview:** explicitly approved by the administrator on 2026-09-14; the administrator confirmed the tested behavior works.
+- **Production smoke:** the dashboard returned HTTP 200 with the Reminder Preview UI, while unauthenticated session, preview, and test-send requests each returned HTTP 401. No Discord message or production mutation was performed.
+- **Local synchronization:** clean `main` and `origin/main` both resolve to `803b858c28a666aef8e14d3aa42d0e84816fa32e`.
 
 ### Required verification
 
